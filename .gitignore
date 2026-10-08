@@ -1,2 +1,38 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+/builds/
+
+# Editor / OS files
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Keystores (never commit secrets)
+*.keystore
+*.jks
+debug.keystore
+
+# Logs
+*.log
+worklog_local.md
+
+# Download directory (build artifacts)
+download/
+
+# Skills directory (not part of game project)
 skills/
-node_modules/
+
+# Misc
+.env
+tool-results/
+upload/
