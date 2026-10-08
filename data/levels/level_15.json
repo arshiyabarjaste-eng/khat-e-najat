@@ -1,0 +1,160 @@
+{
+  "level_id": "level_15",
+  "title": "مرحله پایانی",
+  "chapter": 3,
+  "brief": "گلدان رو با کمترین خط ممکن نجات بده!",
+  "hint": "با یک خط کوتاه و دقیق، مسیر گلدان رو عوض کن.",
+  "gravity": 980.0,
+  "max_line_length": 600.0,
+  "require_special_condition": true,
+  "special_condition_text": "فقط یک خط مجاز است",
+  "max_line_segments": 1,
+  "background_color": [
+    0.35,
+    0.55,
+    0.25,
+    1.0
+  ],
+  "scene_name": "روستای ایران",
+  "objects": [
+    {
+      "type": "wall",
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        40,
+        1280
+      ],
+      "color": [
+        0.55,
+        0.4,
+        0.25,
+        1.0
+      ]
+    },
+    {
+      "type": "wall",
+      "position": [
+        680,
+        0
+      ],
+      "size": [
+        40,
+        1280
+      ],
+      "color": [
+        0.55,
+        0.4,
+        0.25,
+        1.0
+      ]
+    },
+    {
+      "type": "ground",
+      "position": [
+        0,
+        1150
+      ],
+      "size": [
+        720,
+        130
+      ],
+      "color": [
+        0.55,
+        0.4,
+        0.25,
+        1.0
+      ]
+    },
+    {
+      "type": "platform",
+      "position": [
+        460,
+        300
+      ],
+      "size": [
+        220,
+        24
+      ],
+      "color": [
+        0.55,
+        0.4,
+        0.25,
+        1.0
+      ]
+    },
+    {
+      "type": "wall",
+      "position": [
+        340,
+        700
+      ],
+      "size": [
+        40,
+        220
+      ],
+      "color": [
+        0.55,
+        0.4,
+        0.25,
+        1.0
+      ]
+    },
+    {
+      "type": "hazard",
+      "position": [
+        490,
+        1080
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "color": [
+        0.2,
+        0.2,
+        0.2,
+        1.0
+      ],
+      "label": "صخره"
+    },
+    {
+      "type": "goal",
+      "position": [
+        80,
+        1080
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "color": [
+        0.35,
+        0.55,
+        0.25,
+        1.0
+      ],
+      "label": "چمن"
+    },
+    {
+      "type": "crate",
+      "position": [
+        620,
+        250
+      ],
+      "size": [
+        40,
+        50
+      ],
+      "color": [
+        0.65,
+        0.27,
+        0.22,
+        1.0
+      ]
+    }
+  ],
+  "level_number": 15
+}

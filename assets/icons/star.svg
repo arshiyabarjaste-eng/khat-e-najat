@@ -1,0 +1,13 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="100%" stop-color="#F2C133"/>
+    </linearGradient>
+  </defs>
+  <path d="M 40,8 L 49,30 L 73,32 L 54,46 L 60,70 L 40,58 L 20,70 L 26,46 L 7,32 L 31,30 Z"
+        fill="url(#starGrad)"
+        stroke="#283380"
+        stroke-width="2"
+        stroke-linejoin="round"/>
+</svg>
