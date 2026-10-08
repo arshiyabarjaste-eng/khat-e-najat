@@ -100,12 +100,14 @@ func start_simulation() -> void:
 
 ## Called when user presses "Retry" (تلاش مجدد) or after a lose.
 func retry_level() -> void:
-        if physics:
-                physics.reset_to_initial()
+        # Reset simulation flag first so _on_sim_state_changed allows drawing again.
+        sim_running = false
+        # Clear drawn lines (visual + internal state).
         if line_drawer:
                 line_drawer.clear_all()
-        sim_running = false
-        # Re-setup level to reset everything cleanly (objects, time, etc.).
+        # Re-setup the level: this calls teardown() internally, which frees all
+        # dynamic physics bodies and rebuilds the scene from the level data.
+        # This is the cleanest way to reset everything to initial state.
         if current_level != null and world_node != null and physics != null:
                 physics.setup_level(current_level, world_node)
 
@@ -152,7 +154,7 @@ func compute_stars() -> int:
 # --- Signal handlers (forwarded from PhysicsController) ----------------------
 
 func _on_player_reached_goal() -> void:
-        if not sim_running:
+        if not sim_running or current_level == null:
                 return
         line_used_on_win = line_drawer.get_total_length() if line_drawer else 0.0
         var stars := compute_stars()

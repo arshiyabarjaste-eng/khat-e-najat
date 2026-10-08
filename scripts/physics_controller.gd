@@ -114,7 +114,8 @@ func _instantiate_object(obj: Dictionary, level: LevelData) -> void:
 func _make_static_rect(pos: Vector2, size: Vector2, rot_deg: float,
                 color: Color, label: String, parent: Node) -> void:
         var body := StaticBody2D.new()
-        body.position = pos
+        # `pos` in level JSON is the top-left corner; convert to center for the body.
+        body.position = pos + size / 2.0
         body.rotation_degrees = rot_deg
         body.collision_layer = 0b00001   # world layer
         body.collision_mask = 0b11111    # collide with everything
@@ -146,7 +147,8 @@ func _make_static_rect(pos: Vector2, size: Vector2, rot_deg: float,
 func _make_hazard(pos: Vector2, size: Vector2, rot_deg: float,
                 color: Color, label: String) -> void:
         var area := Area2D.new()
-        area.position = pos
+        # `pos` is top-left; convert to center for the Area2D.
+        area.position = pos + size / 2.0
         area.rotation_degrees = rot_deg
         area.collision_layer = 0b00100   # hazard layer
         area.collision_mask = 0b00010    # detect player
@@ -241,9 +243,9 @@ func _make_player(obj: Dictionary, pos: Vector2, size: Vector2, color: Color) ->
         body.add_child(vis)
         _world_node.add_child(body)
         _player_body = body
-        # Hook up "out of bounds" detection via body_exited_scene (we approximate
-        # by checking global position each physics tick).
-        _player_initial_transform = body.global_transform
+        # Cache the initial transform for reset. Use `transform` (local) since
+        # the World node has identity transform, so local == global.
+        _player_initial_transform = body.transform
 
 
 # --- Line physics ------------------------------------------------------------
@@ -311,10 +313,10 @@ func get_time_remaining() -> float:
 func reset_to_initial() -> void:
         stop_simulation()
         if _player_body != null:
-                # Use deferred calls to safely modify the body.
+                # Use deferred calls to safely modify the body inside the physics tick.
                 _player_body.set_deferred("linear_velocity", Vector2.ZERO)
                 _player_body.set_deferred("angular_velocity", 0.0)
-                _player_body.set_deferred("global_transform", _player_initial_transform)
+                _player_body.set_deferred("transform", _player_initial_transform)
                 _player_body.set_deferred("sleeping", false)
                 _player_body.set_deferred("freeze", false)
         # Remove all line bodies (they were created from drawn strokes).
@@ -322,11 +324,6 @@ func reset_to_initial() -> void:
                 if is_instance_valid(b):
                         b.queue_free()
         _line_bodies.clear()
-        # Reset time limit if any.
-        if _has_time_limit:
-                # Will be reset on next setup_level — but for retry, we reset here.
-                # We don't have the original time_limit cached, so caller must re-setup.
-                pass
 
 
 # --- Triggers ----------------------------------------------------------------
@@ -334,7 +331,12 @@ func reset_to_initial() -> void:
 func _on_goal_body_entered(body: Node2D) -> void:
         if not _sim_running:
                 return
-        if body == _player_body:
+        # Area2D.body_entered fires for the PhysicsBody2D itself (not its children).
+        # But to be safe, also check the owner in case a child triggered it.
+        var owner_body := body
+        if body is CollisionShape2D or body is ColorRect:
+                owner_body = body.get_parent()
+        if owner_body == _player_body:
                 player_reached_goal.emit()
                 stop_simulation()
 
@@ -342,7 +344,10 @@ func _on_goal_body_entered(body: Node2D) -> void:
 func _on_hazard_body_entered(body: Node2D) -> void:
         if not _sim_running:
                 return
-        if body == _player_body:
+        var owner_body := body
+        if body is CollisionShape2D or body is ColorRect:
+                owner_body = body.get_parent()
+        if owner_body == _player_body:
                 player_entered_hazard.emit()
                 stop_simulation()
 
@@ -358,6 +363,8 @@ func check_player_out_of_bounds(bounds: Rect2) -> bool:
 
 func teardown() -> void:
         stop_simulation()
+        # Only free the dynamic objects we created — NOT the persistent
+        # children of world_node (LineDrawer, PhysicsController itself).
         for b in _line_bodies:
                 if is_instance_valid(b):
                         b.queue_free()
@@ -378,7 +385,3 @@ func teardown() -> void:
         _player_body = null
         _has_time_limit = false
         _time_remaining = 0.0
-        if _world_node != null:
-                for c in _world_node.get_children():
-                        c.queue_free()
-        _world_node = null
