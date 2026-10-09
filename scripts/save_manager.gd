@@ -5,7 +5,8 @@
 ## and ease of debugging. The format is forward-compatible (additive).
 ## -----------------------------------------------------------------------------
 extends Node
-class_name SaveManager
+# SaveManager — registered as autoload singleton in project.godot.
+# Do NOT add `class_name` here; it conflicts with the autoload name in Godot 4.x.
 
 signal data_loaded(data: Dictionary)
 signal data_saved()

@@ -178,12 +178,15 @@ func hide_hint() -> void:
 func get_ui_exclusion_rects() -> Array[Rect2]:
         var out: Array[Rect2] = []
         # The top bar (title + brief) and bottom bar (buttons).
-        for node in [level_title_label, brief_label, start_button, clear_button,
-                                 retry_button, undo_button, back_button, hint_button, timer_label]:
+        var nodes: Array = [level_title_label, brief_label, start_button, clear_button,
+                retry_button, undo_button, back_button, hint_button, timer_label]
+        for node in nodes:
                 if node == null:
                         continue
-                var rect := node.get_global_rect()
-                # Grow slightly for touch comfort.
+                if not (node is Control):
+                        continue
+                var ctrl: Control = node
+                var rect: Rect2 = ctrl.get_global_rect()
                 out.append(rect.grow(8))
         return out
 

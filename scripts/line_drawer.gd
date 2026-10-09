@@ -200,11 +200,11 @@ func undo_last_stroke() -> bool:
         if _strokes.is_empty():
                 return false
         _strokes.pop_back()
-        var removed_len := _stroke_lengths.pop_back()
+        var removed_len: float = float(_stroke_lengths.pop_back())
         _total_length = max(0.0, _total_length - removed_len)
         # Re-render: remove last renderer.
         if not _line_renderers.is_empty():
-                var lr := _line_renderers.pop_back()
+                var lr: Line2D = _line_renderers.pop_back()
                 if is_instance_valid(lr):
                         lr.queue_free()
         length_changed.emit(_total_length)

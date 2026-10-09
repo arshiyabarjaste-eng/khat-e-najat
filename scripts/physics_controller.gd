@@ -64,11 +64,14 @@ func _physics_process(delta: float) -> void:
 func setup_level(level: LevelData, world_node: Node2D) -> void:
         teardown()
         _world_node = world_node
-        # Apply gravity via the default physics area. We also set gravity_scale
-        # on the player body as a fallback in case the server call fails.
-        var default_area := PhysicsServer2D.area_get_default_area()
-        if default_area.is_valid():
-                PhysicsServer2D.area_set_param(default_area,
+        # Apply gravity via Project Settings (only works globally, not per-area).
+        # For per-level gravity we set it on the default physics space.
+        # Note: in Godot 4.3, PhysicsServer2D.area_get_default_area() returns
+        # the default area RID. We pass it through PhysicsServer2D directly.
+        var space_rid: RID = get_viewport().find_world_2d().space
+        if space_rid.is_valid():
+                # Set gravity on the space's default area.
+                PhysicsServer2D.area_set_param(space_rid,
                         PhysicsServer2D.AREA_PARAM_GRAVITY, level.gravity)
         # Optional time limit.
         if level.time_limit > 0.0:
@@ -331,12 +334,8 @@ func reset_to_initial() -> void:
 func _on_goal_body_entered(body: Node2D) -> void:
         if not _sim_running:
                 return
-        # Area2D.body_entered fires for the PhysicsBody2D itself (not its children).
-        # But to be safe, also check the owner in case a child triggered it.
-        var owner_body := body
-        if body is CollisionShape2D or body is ColorRect:
-                owner_body = body.get_parent()
-        if owner_body == _player_body:
+        # Area2D.body_entered fires for PhysicsBody2D instances.
+        if body == _player_body:
                 player_reached_goal.emit()
                 stop_simulation()
 
@@ -344,10 +343,7 @@ func _on_goal_body_entered(body: Node2D) -> void:
 func _on_hazard_body_entered(body: Node2D) -> void:
         if not _sim_running:
                 return
-        var owner_body := body
-        if body is CollisionShape2D or body is ColorRect:
-                owner_body = body.get_parent()
-        if owner_body == _player_body:
+        if body == _player_body:
                 player_entered_hazard.emit()
                 stop_simulation()
 
